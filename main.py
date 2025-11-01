@@ -38,3 +38,25 @@ fig.update_traces(
 
 # 3. 🚨 THE FIX: Use st.plotly_chart() to render the figure in Streamlit
 st.plotly_chart(fig, use_container_width=True)
+
+# --- 1. Data Preparation (No extra aggregation needed for px.bar when using raw data) ---
+gender_col = 'What is your gender?'
+occupation_col = 'What is your occupation?'
+custom_pink_blue_palette = ["#ADD8E6", "#FFB6C1"] # Light Blue, Light Pink
+
+# --- 2. Plotly Bar Chart ---
+fig_1 = px.bar(
+    df_url,
+    x=occupation_col,
+    color=gender_col,
+    # Use the custom color palette
+    color_discrete_sequence=custom_pink_blue_palette,
+    # Set the title and labels
+    title='Occupation Distribution Grouped by Gender',
+    labels={'x': occupation_col, 'y': 'Number of Respondents (Count)'}
+)
+
+# Optional: Improve layout and rotate x-axis labels
+fig_1.update_xaxes(tickangle=30)
+fig_1.update_layout(xaxis={'categoryorder': 'total descending'}) # Order bars by total count
+# fig_1.show()
