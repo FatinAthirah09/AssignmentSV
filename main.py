@@ -12,30 +12,42 @@ st.header("Scientific Visualization", divider="gray")
 st.title("🎓 Sleep Survey and Performance Analysis")
 st.markdown("---")
 
-# ==========================================================
-# 🚨 FIX GOES HERE: Load the DataFrame before using 'df'
-# ==========================================================
+import pandas as pd
+import plotly.express as px
 
-try:
-    # 💡 Replace 'your_data_file.csv' with the actual path/name of your data file
-    df = pd.read_csv('your_data_file.csv') 
-except FileNotFoundError:
-    st.error("Error: Data file 'your_data_file.csv' not found. Please check the file path.")
-    st.stop() # Stop the script if data isn't loaded
+# --- START: Data Simulation (REPLACE with your actual data handling) ---
+# Create a dummy DataFrame to mimic the structure of age_counts
+data = {
+    'Age Group': ['18-24', '25-34', '35-44', '45-54', '55+'],
+    'Count': [150, 220, 180, 90, 40]
+}
+df_example = pd.DataFrame(data)
+# --- END: Data Simulation ---
 
-# --- VISUALIZATION CODE (Now 'df' is defined) ---
-age_counts = df['Your Age'].value_counts().reset_index()
-age_counts.columns = ['Age Group', 'Count']
 
+# 1. Use px.pie for a concise pie chart
 fig = px.pie(
-    age_counts,
-    values='Count',
+    # Your DataFrame
+    df_example,
+    # Column for the pie slice labels (age groups)
     names='Age Group',
-    title='Distribution of Age Groups (Pastel Theme)',
-    color_discrete_sequence=px.colors.qualitative.Pastel, 
-    hole=0.3
+    # Column for the pie slice sizes (counts)
+    values='Count',
+    # 2. Apply the Plotly 'Pastel' color sequence
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+    # Title
+    title='Distribution of Age Groups (Pastel Theme)'
 )
 
-# ... (rest of the Plotly update traces) ...
+# Optional: Customize the appearance for better readability
+fig.update_traces(
+    # Show percentage and label inside the slice
+    textinfo='percent+label',
+    # Positioning of the text
+    textposition='inside',
+    # Rotation (similar to startangle, though less critical in interactive charts)
+    rotation=140
+)
 
-st.plotly_chart(fig, use_container_width=True) # Use st.plotly_chart to display in Streamlit
+# Display the interactive chart
+fig.show()
