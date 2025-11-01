@@ -46,7 +46,7 @@ custom_pink_blue_palette = ["#ADD8E6", "#FFB6C1"] # Light Blue, Light Pink
 
 # --- 2. Plotly Bar Chart ---
 fig_1 = px.bar(
-    df_url,
+    df,
     x=occupation_col,
     color=gender_col,
     # Use the custom color palette
