@@ -43,62 +43,68 @@ st.plotly_chart(fig, use_container_width=True)
 
 import pandas as pd
 import plotly.express as px
-import streamlit as st
+# Assuming df_url is your loaded DataFrame
 
-# Define columns (These should match the columns in your actual DataFrame)
+# Define columns (assuming these names are in your loaded DataFrame 'df_url')
 gender_col = 'What is your gender?'
 occupation_col = 'What is your occupation?'
 
 # Define the custom Pink and Blue palette
-CUSTOM_PINK_BLUE_PALETTE = ["#ADD8E6", "#FFB6C1"] 
+# Plotly uses a dictionary/list of colors, similar to Seaborn's list/dict.
+# #ADD8E6 is a soft light blue
+# #FFB6C1 is a soft light pink
+custom_pink_blue_palette = ["#ADD8E6", "#FFB6C1"] 
 
-st.title("Occupation Distribution by Gender")
+# Get the order for the x-axis (occupations) based on frequency
+# This step ensures the bars are ordered by count, similar to the Seaborn code.
+# The actual ordering within Plotly is sometimes better managed by letting Plotly sort
+# the *bars* by their total count using 'category_orders', but for simplicity 
+# and direct conversion, we'll focus on the x-axis values.
+# However, Plotly's default is usually alphabetical or data order, so we'll omit
+# complex ordering for this simple conversion, as it's often more intuitive in Plotly's
+# interactive environment to allow the user to sort.
+# If strict ordering by frequency is required, you'd calculate value_counts() 
+# and pass the index to the 'category_orders' argument.
 
-# --- START: Data Handling (Replace with your actual data loading) ---
-# Create a dummy DataFrame for demonstration purposes
-df_url = pd.DataFrame({
-    occupation_col: ['Engineer', 'Doctor', 'Engineer', 'Artist', 'Doctor', 'Engineer', 'Artist', 'Artist', 'Doctor', 'Engineer', 'Artist', 'Doctor', 'Teacher', 'Teacher'],
-    gender_col: ['Male', 'Female', 'Female', 'Female', 'Male', 'Male', 'Male', 'Female', 'Male', 'Female', 'Male', 'Female', 'Female', 'Male']
-})
-
-# 1. Aggregate the data (Count the occurrences for plotting)
-count_df = df_url.groupby([occupation_col, gender_col]).size().reset_index(name='Count')
-
-# 2. Calculate the order based on total occupation counts (for correct sorting on the x-axis)
-occupation_order = df_url[occupation_col].value_counts().index.tolist()
-
-# 3. Define the custom color map (Ensures colors match specific genders)
-# Assuming 'Male' is Light Blue (#ADD8E6) and 'Female' is Light Pink (#FFB6C1)
-color_map = {
-    'Male': CUSTOM_PINK_BLUE_PALETTE[0],
-    'Female': CUSTOM_PINK_BLUE_PALETTE[1]
-}
-# --- END: Data Handling ---
-
-
-# --- PLOTLY CHART CREATION ---
-fig = px.bar(
-    count_df,
+# Generate the Grouped Bar Chart using plotly.express.histogram
+fig = px.histogram(
+    df_url,
     x=occupation_col,
-    y='Count',
-    color=gender_col,
-    barmode='group',
-    title='Occupation Distribution Grouped by Gender',
-    # Apply custom order
-    category_orders={occupation_col: occupation_order},
-    # Apply custom colors
-    color_discrete_map=color_map,
-    # Tooltip setup for clear hover data
-    hover_data={'Count': True, gender_col: True} 
+    color=gender_col,  # 'color' is the equivalent of 'hue'
+    # Use the custom list of colors. Plotly cycles through this list for the 'color' variable.
+    color_discrete_sequence=custom_pink_blue_palette, 
+    # Set labels for the axes and the title
+    labels={
+        occupation_col: occupation_col,
+        'count': 'Number of Respondents (Count)', # Plotly uses 'count' by default for the y-axis
+        gender_col: gender_col
+    },
+    title='Occupation Distribution Grouped by Gender'
 )
 
-# Customize the layout for better presentation
+# Customize the layout
+# Plotly is interactive by default, so 'rotation' is often less critical
 fig.update_layout(
-    xaxis_title=occupation_col,
+    xaxis_title=occupation_col, # Re-setting titles for clarity and potential overrides
     yaxis_title='Number of Respondents (Count)',
-    xaxis={'tickangle': 30},
-    legend_title=gender_col,
+    title_x=0.5, # Center the title
+    legend_title=gender_col, # Set the legend title
 )
 
-# --- STREAMLIT DISPLAY (THE KEY LINE!) ---
-st.plotly_chart(fig, use_container_width=True)
+# Rotate x-axis labels (optional, but good for long occupation names)
+fig.update_xaxes(
+    tickangle=30,
+    title_standoff=10 # Add a little space between the title and the labels
+)
+
+# Add counts on top of the bars for clarity (equivalent to the annotation loop)
+# 'text_auto=True' automatically shows the count on each bar.
+fig.update_traces(textposition='outside', texttemplate='%{y}', textfont_size=10)
+
+
+# Show the figure (The equivalent of plt.show() in Matplotlib)
+fig.show()
+
+# To save the figure (equivalent of plt.savefig()), use fig.write_image
+# To save as PNG, you generally need to have the 'kaleido' package installed:
+# fig.write_image("occupation_by_gender_grouped_bar_chart.png")
