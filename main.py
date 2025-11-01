@@ -26,7 +26,7 @@ fig = px.pie(
     names='Age Group',
     values='Count',
     color_discrete_sequence=px.colors.qualitative.Pastel,
-    title='Distribution of Age Groups (Pastel Theme)'
+    title='Distribution of Age Groups'
 )
 
 # 2. Customize the appearance
@@ -83,7 +83,7 @@ fig = px.bar(
     y='Count',
     color=gender_col,
     barmode='group',
-    title='Occupation Distribution Grouped by Gender (Pastel Theme)',
+    title='Occupation Distribution Grouped by Gender',
     # Apply custom order
     category_orders={occupation_col: occupation_order},
     # Apply custom colors
